@@ -20,7 +20,7 @@ import norms
 import numpy as np
 
 def conv3x3(in_planes, out_planes, stride=1):
-    return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=True)
+    return nn.Conv1d(in_planes, out_planes, kernel_size=3, stride=stride, padding=1, bias=True)
 
 def conv_init(m):
     classname = m.__class__.__name__
@@ -44,15 +44,15 @@ class wide_basic(nn.Module):
         super(wide_basic, self).__init__()
         self.lrelu = nn.LeakyReLU(leak)
         self.bn1 = get_norm(in_planes, norm)
-        self.conv1 = nn.Conv2d(in_planes, planes, kernel_size=3, padding=1, bias=True)
+        self.conv1 = nn.Conv1d(in_planes, planes, kernel_size=3, padding=1, bias=True)
         self.dropout = Identity() if dropout_rate == 0.0 else nn.Dropout(p=dropout_rate)
         self.bn2 = get_norm(planes, norm)
-        self.conv2 = nn.Conv2d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=True)
+        self.conv2 = nn.Conv1d(planes, planes, kernel_size=3, stride=stride, padding=1, bias=True)
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != planes:
             self.shortcut = nn.Sequential(
-                nn.Conv2d(in_planes, planes, kernel_size=1, stride=stride, bias=True),
+                nn.Conv1d(in_planes, planes, kernel_size=1, stride=stride, bias=True),
             )
 
     def forward(self, x):
@@ -67,9 +67,9 @@ def get_norm(n_filters, norm):
     if norm is None:
         return Identity()
     elif norm == "batch":
-        return nn.BatchNorm2d(n_filters, momentum=0.9)
+        return nn.BatchNorm1d(n_filters, momentum=0.9)
     elif norm == "instance":
-        return nn.InstanceNorm2d(n_filters, affine=True)
+        return nn.InstanceNorm1d(n_filters, affine=True)
     elif norm == "layer":
         return nn.GroupNorm(1, n_filters)
     elif norm == "act":
@@ -120,6 +120,6 @@ class Wide_ResNet(nn.Module):
         if self.sum_pool:
             out = out.view(out.size(0), out.size(1), -1).sum(2)
         else:
-            out = F.avg_pool2d(out, 8)
+            out = F.avg_pool1d(out, 8)
         out = out.view(out.size(0), -1)
         return out
