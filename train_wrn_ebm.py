@@ -16,7 +16,6 @@
 import utils
 import torch as t, torch.nn as nn, torch.nn.functional as tnnF, torch.distributions as tdist
 from torch.utils.data import DataLoader, Dataset
-import torchvision as tv, torchvision.transforms as tr
 import os
 import sys
 import argparse
@@ -126,35 +125,35 @@ def get_model_and_buffer(args, device, sample_q):
 
 
 def get_data(args):
-    if args.dataset == "svhn":
-        transform_train = tr.Compose(
-            [tr.Pad(4, padding_mode="reflect"),
-             tr.RandomCrop(im_sz),
-             tr.ToTensor(),
-             tr.Normalize((.5, .5, .5), (.5, .5, .5)),
-             lambda x: x + args.sigma * t.randn_like(x)]
-        )
-    else:
-        transform_train = tr.Compose(
-            [tr.Pad(4, padding_mode="reflect"),
-             tr.RandomCrop(im_sz),
-             tr.RandomHorizontalFlip(),
-             tr.ToTensor(),
-             tr.Normalize((.5, .5, .5), (.5, .5, .5)),
-             lambda x: x + args.sigma * t.randn_like(x)]
-        )
-    transform_test = tr.Compose(
-        [tr.ToTensor(),
-         tr.Normalize((.5, .5, .5), (.5, .5, .5)),
-         lambda x: x + args.sigma * t.randn_like(x)]
-    )
+    #if args.dataset == "svhn":
+    #    transform_train = tr.Compose(
+    #        [tr.Pad(4, padding_mode="reflect"),
+    #         tr.RandomCrop(im_sz),
+    #         tr.ToTensor(),
+    #         tr.Normalize((.5, .5, .5), (.5, .5, .5)),
+    #         lambda x: x + args.sigma * t.randn_like(x)]
+    #    )
+    #else:
+    #    transform_train = tr.Compose(
+    #        [tr.Pad(4, padding_mode="reflect"),
+    #         tr.RandomCrop(im_sz),
+    #         tr.RandomHorizontalFlip(),
+    #         tr.ToTensor(),
+    #         tr.Normalize((.5, .5, .5), (.5, .5, .5)),
+    #         lambda x: x + args.sigma * t.randn_like(x)]
+    #    )
+    #transform_test = tr.Compose(
+    #    [tr.ToTensor(),
+    #     tr.Normalize((.5, .5, .5), (.5, .5, .5)),
+    #     lambda x: x + args.sigma * t.randn_like(x)]
+    #)
     def dataset_fn(train, transform):
         if args.dataset == "cifar10":
-            return tv.datasets.CIFAR10(root=args.data_root, transform=transform, download=True, train=train)
+            return tv.datasets.CIFAR10(root=args.data_root, transform=None, download=True, train=train)
         elif args.dataset == "cifar100":
-            return tv.datasets.CIFAR100(root=args.data_root, transform=transform, download=True, train=train)
+            return tv.datasets.CIFAR100(root=args.data_root, transform=None, download=True, train=train)
         else:
-            return tv.datasets.SVHN(root=args.data_root, transform=transform, download=True,
+            return tv.datasets.SVHN(root=args.data_root, transform=None, download=True,
                                     split="train" if train else "test")
 
     # get all training inds
